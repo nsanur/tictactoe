@@ -9,7 +9,7 @@ const __dirname = dirname(__filename);
 const httpServer = createServer();
 const io = new Server(httpServer, {
   cors: {
-    origin: "https://tictactoe-byn.netlify.app",
+    origin: "https://tictactoe-nine-sigma.vercel.app",
     methods: ["GET", "POST"]
   }
 });
