@@ -10,7 +10,7 @@ const httpServer = createServer();
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "https://tictactoe-jgo4e5tsd-nsanurs-projects.vercel.app", // Frontend URL'si
+    origin: "https://tictactoe-nsanurs-projects.vercel.app", // Frontend URL'si
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
     credentials: true
