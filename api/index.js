@@ -7,12 +7,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const httpServer = createServer();
+
 const io = new Server(httpServer, {
   cors: {
-    origin: "https://tictactoe-byn.vercel.app",
-    methods: ["GET", "POST"]
+    origin: "https://tictactoe-jgo4e5tsd-nsanurs-projects.vercel.app", // Frontend URL'si
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"],
+    credentials: true
   }
 });
+
 
 const gameState = {
   board: Array(9).fill(''),
