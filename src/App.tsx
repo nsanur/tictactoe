@@ -23,9 +23,8 @@ const App: React.FC = () => {
   } = useGameStore();
 
   useEffect(() => {
-    const SOCKET_URL = import.meta.env.PROD 
-      ? 'https://tictactoe-byn.vercel.app' 
-      : 'http://localhost:3001';
+    const SOCKET_URL = import.meta.env.VITE_APP_SOCKET_URL || 'http://localhost:3001';
+
       
     const newSocket = io(SOCKET_URL);
     setSocket(newSocket);
