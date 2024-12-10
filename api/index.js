@@ -1,13 +1,25 @@
-import { Server } from "socket.io";
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-let io; // Global değişken
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const httpServer = createServer();
+const io = new Server(httpServer, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"]
+  }
+});
 
 const gameState = {
   board: Array(9).fill(''),
   currentPlayer: '',
   players: [],
   spectators: [],
-  winner: null,
+  winner: null
 };
 
 const checkWinner = (board) => {
@@ -34,91 +46,84 @@ const resetGame = () => {
   io.emit('gameState', gameState);
 };
 
-export default function handler(req, res) {
-  if (!io) {
-    io = new Server(res.socket.server, {
-      cors: {
-        origin: "https://tictactoe-nine-sigma.vercel.app", // Frontend URL
-        methods: ["GET", "POST"]
-      },
-    });
+io.on('connection', (socket) => {
+  socket.on('join', ({ name }) => {
+    if (gameState.players.some(p => p.name === name)) {
+      socket.emit('error', { message: 'Name already taken' });
+      return;
+    }
 
-    io.on("connection", (socket) => {
-      socket.on('join', ({ name }) => {
-        if (gameState.players.some(p => p.name === name)) {
-          socket.emit('error', { message: 'Name already taken' });
-          return;
-        }
+    const player = {
+      id: socket.id,
+      name,
+      wins: 0,
+      losses: 0
+    };
 
-        const player = {
-          id: socket.id,
-          name,
+    if (gameState.players.length < 2) {
+      gameState.players.push(player);
+      if (gameState.players.length === 1) {
+        gameState.currentPlayer = name;
+      }
+    } else {
+      gameState.spectators.push(name);
+    }
+
+    socket.emit('joinSuccess', { name });
+    io.emit('gameState', gameState);
+  });
+
+  socket.on('move', ({ index }) => {
+    const player = gameState.players.find(p => p.id === socket.id);
+    if (!player || player.name !== gameState.currentPlayer || gameState.board[index]) return;
+
+    const symbol = gameState.players.indexOf(player) === 0 ? 'X' : 'O';
+    gameState.board[index] = symbol;
+
+    const winner = checkWinner(gameState.board);
+    if (winner) {
+      gameState.winner = winner;
+      if (winner !== 'draw') {
+        const winningPlayer = gameState.players.find(p => p.name === gameState.currentPlayer);
+        const losingPlayer = gameState.players.find(p => p.name !== gameState.currentPlayer);
+        if (winningPlayer) winningPlayer.wins++;
+        if (losingPlayer) losingPlayer.losses++;
+      }
+      setTimeout(resetGame, 3000);
+    } else {
+      const nextPlayerIndex = (gameState.players.indexOf(player) + 1) % 2;
+      gameState.currentPlayer = gameState.players[nextPlayerIndex].name;
+    }
+
+    io.emit('gameState', gameState);
+  });
+
+  socket.on('disconnect', () => {
+    const playerIndex = gameState.players.findIndex(p => p.id === socket.id);
+    if (playerIndex !== -1) {
+      gameState.players.splice(playerIndex, 1);
+      if (gameState.spectators.length > 0) {
+        const newPlayer = {
+          id: '',
+          name: gameState.spectators[0],
           wins: 0,
-          losses: 0,
+          losses: 0
         };
+        gameState.players.push(newPlayer);
+        gameState.spectators.shift();
+      }
+      resetGame();
+    } else {
+      const spectatorName = gameState.spectators.find(name => name === socket.data.name);
+      if (spectatorName) {
+        gameState.spectators = gameState.spectators.filter(name => name !== spectatorName);
+      }
+    }
+    io.emit('gameState', gameState);
+  });
+});
 
-        if (gameState.players.length < 2) {
-          gameState.players.push(player);
-          if (gameState.players.length === 1) {
-            gameState.currentPlayer = name;
-          }
-        } else {
-          gameState.spectators.push(name);
-        }
-
-        socket.emit('joinSuccess', { name });
-        io.emit('gameState', gameState);
-      });
-
-      socket.on('move', ({ index }) => {
-        const player = gameState.players.find(p => p.id === socket.id);
-        if (!player || player.name !== gameState.currentPlayer || gameState.board[index]) return;
-
-        const symbol = gameState.players.indexOf(player) === 0 ? 'X' : 'O';
-        gameState.board[index] = symbol;
-
-        const winner = checkWinner(gameState.board);
-        if (winner) {
-          gameState.winner = winner;
-          if (winner !== 'draw') {
-            const winningPlayer = gameState.players.find(p => p.name === gameState.currentPlayer);
-            const losingPlayer = gameState.players.find(p => p.name !== gameState.currentPlayer);
-            if (winningPlayer) winningPlayer.wins++;
-            if (losingPlayer) losingPlayer.losses++;
-          }
-          setTimeout(resetGame, 3000);
-        } else {
-          const nextPlayerIndex = (gameState.players.indexOf(player) + 1) % 2;
-          gameState.currentPlayer = gameState.players[nextPlayerIndex].name;
-        }
-
-        io.emit('gameState', gameState);
-      });
-
-      socket.on('disconnect', () => {
-        const playerIndex = gameState.players.findIndex(p => p.id === socket.id);
-        if (playerIndex !== -1) {
-          gameState.players.splice(playerIndex, 1);
-          if (gameState.spectators.length > 0) {
-            const newPlayer = {
-              id: '',
-              name: gameState.spectators[0],
-              wins: 0,
-              losses: 0,
-            };
-            gameState.players.push(newPlayer);
-            gameState.spectators.shift();
-          }
-          resetGame();
-        } else {
-          const spectatorName = gameState.spectators.find(name => name === socket.data.name);
-          if (spectatorName) {
-            gameState.spectators = gameState.spectators.filter(name => name !== spectatorName);
-          }
-        }
-        io.emit('gameState', gameState);
-      });
-    });
-  }
-  res.end(); // Serverless function için gerekli
-}
+const PORT = process.env.PORT || 3001;
+httpServer.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

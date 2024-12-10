@@ -24,7 +24,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const SOCKET_URL = import.meta.env.PROD 
-      ? 'https://tictactoe-nine-sigma.vercel.app' 
+      ? 'https://tictactoe-byn.com' 
       : 'http://localhost:3001';
       
     const newSocket = io(SOCKET_URL);
