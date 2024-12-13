@@ -24,7 +24,7 @@ const App = () => {
 
   useEffect(() => {
     const SOCKET_URL = import.meta.env.PROD 
-      ? 'https://tictactoe-byn.com' 
+      ? 'https://tictactoe-4n35.onrender.com' 
       : 'http://localhost:3001';
       
     const newSocket = io(SOCKET_URL);
