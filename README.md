@@ -14,3 +14,11 @@ This project is a multiplayer Tic-Tac-Toe game that supports up to 4 players con
 1. **Install client dependencies**:
    ```bash
    npm install
+
+   npm run dev
+
+1. **Install server dependencies**:
+   ```bash
+   npm install
+
+   node server.js
