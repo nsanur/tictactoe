@@ -23,7 +23,8 @@ const App = () => {
   } = useGameStore();
 
   useEffect(() => {
-    const SOCKET_URL = import.meta.env.PROD 
+    // Prod ortamında doğru URL'yi kullan
+    const SOCKET_URL = process.env.NODE_ENV === 'production' 
       ? 'https://tictactoe-4n35.onrender.com' 
       : 'http://localhost:10000';
       
