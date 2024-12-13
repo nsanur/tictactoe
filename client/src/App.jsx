@@ -23,10 +23,9 @@ const App = () => {
   } = useGameStore();
 
   useEffect(() => {
-    // Prod ortamında doğru URL'yi kullan
-    const SOCKET_URL = process.env.NODE_ENV === 'production' 
-      ? 'https://tictactoe-4n35.onrender.com' 
-      : 'http://localhost:10000';
+    const SOCKET_URL = import.meta.env.PROD 
+      ? 'https://tictactoe-byn.com' 
+      : 'http://localhost:3001';
       
     const newSocket = io(SOCKET_URL);
     setSocket(newSocket);
@@ -56,9 +55,9 @@ const App = () => {
     });
 
     return () => {
-      newSocket.disconnect(); // Bağlantıyı temizle
+      newSocket.disconnect();
     };
-  }, [setSocket, setIsConnected, setBoard, setCurrentPlayer, setPlayers, setSpectators, setWinner, setPlayerName, setError, reset]);
+  }, []);
 
   if (!isConnected) {
     return (
