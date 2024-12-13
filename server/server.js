@@ -9,7 +9,7 @@ const __dirname = dirname(__filename);
 const httpServer = createServer();
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "https://tictactoe-eosin-rho.vercel.app", // http://localhost:5173
     methods: ["GET", "POST"]
   }
 });
