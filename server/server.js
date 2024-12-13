@@ -2,17 +2,23 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import express from 'express';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const httpServer = createServer();
+// Express server oluşturuluyor
+const app = express();
+const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "http://localhost:5173",  // React frontend'inizin çalıştığı port
     methods: ["GET", "POST"]
   }
 });
+
+// React build dosyalarını sunmak için
+app.use(express.static(join(__dirname, 'client', 'build')));
 
 const gameState = {
   board: Array(9).fill(''),
@@ -22,11 +28,12 @@ const gameState = {
   winner: null
 };
 
+// Kazananı kontrol eden fonksiyon
 const checkWinner = (board) => {
   const lines = [
-    [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
-    [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
-    [0, 4, 8], [2, 4, 6] // diagonals
+    [0, 1, 2], [3, 4, 5], [6, 7, 8], // satırlar
+    [0, 3, 6], [1, 4, 7], [2, 5, 8], // sütunlar
+    [0, 4, 8], [2, 4, 6] // çaprazlar
   ];
 
   for (const [a, b, c] of lines) {
@@ -39,6 +46,7 @@ const checkWinner = (board) => {
   return null;
 };
 
+// Oyunu sıfırlama fonksiyonu
 const resetGame = () => {
   gameState.board = Array(9).fill('');
   gameState.winner = null;
@@ -47,6 +55,9 @@ const resetGame = () => {
 };
 
 io.on('connection', (socket) => {
+  console.log('A user connected:', socket.id);
+
+  // Oyuncu katıldığında
   socket.on('join', ({ name }) => {
     if (gameState.players.some(p => p.name === name)) {
       socket.emit('error', { message: 'Name already taken' });
@@ -73,6 +84,7 @@ io.on('connection', (socket) => {
     io.emit('gameState', gameState);
   });
 
+  // Hamle yapıldığında
   socket.on('move', ({ index }) => {
     const player = gameState.players.find(p => p.id === socket.id);
     if (!player || player.name !== gameState.currentPlayer || gameState.board[index]) return;
@@ -98,6 +110,7 @@ io.on('connection', (socket) => {
     io.emit('gameState', gameState);
   });
 
+  // Bağlantı kesildiğinde
   socket.on('disconnect', () => {
     const playerIndex = gameState.players.findIndex(p => p.id === socket.id);
     if (playerIndex !== -1) {
@@ -123,6 +136,7 @@ io.on('connection', (socket) => {
   });
 });
 
+// Sunucu çalıştırılıyor
 const PORT = process.env.PORT || 3001;
 httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
