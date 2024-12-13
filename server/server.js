@@ -12,7 +12,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173",  // React frontend'inizin çalıştığı port
+    origin: "https://tictactoe-byn.netlify.app",
     methods: ["GET", "POST"]
   }
 });
@@ -136,8 +136,7 @@ io.on('connection', (socket) => {
   });
 });
 
-// Sunucu çalıştırılıyor
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 10000;
 httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
