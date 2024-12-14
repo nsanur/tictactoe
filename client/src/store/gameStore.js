@@ -29,5 +29,6 @@ export const useGameStore = create((set) => ({
     currentPlayer: '',
     winner: null,
     error: null,
+    playerName: '', // Reset playerName here
   }),
-}));
+}));  
