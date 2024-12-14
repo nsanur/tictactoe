@@ -167,6 +167,9 @@ io.on('connection', (socket) => {
       }
     }
     io.emit('gameState', gameState);
+
+    // Frontend'e yönlendirme için bildirim gönder
+    socket.emit('redirectToHomePage');
   });
 });
 
