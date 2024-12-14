@@ -24,7 +24,7 @@ const App = () => {
   } = useGameStore();
 
   useEffect(() => {
-    // Tarayıcı depolamasını kontrol et
+    // Sayfa yenilendiğinde playerName kontrolü yap
     const savedPlayerName = localStorage.getItem('playerName');
     if (savedPlayerName) {
       setPlayerName(savedPlayerName);
