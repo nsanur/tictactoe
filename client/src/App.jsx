@@ -5,6 +5,7 @@ import Board from './components/Board';
 import PlayerList from './components/PlayerList';
 import GameStatus from './components/GameStatus';
 import Login from './components/Login';
+import LeaveButton from './components/LeaveButton'; // LeaveButton import edildi
 
 const App = () => {
   const { 
@@ -59,10 +60,27 @@ const App = () => {
     };
   }, []);
 
+  const handleLeave = () => {
+    const socket = useGameStore.getState().socket;
+
+    if (socket) {
+      socket.emit('leave'); // Backend'e çıkış bildirimini gönderme
+    }
+
+    // Oyun durumunu sıfırlama
+    reset();
+
+    // Tüm store verilerini sıfırlama
+    setPlayerName('');
+    setPlayers([]);
+    setSpectators([]);
+    setWinner(null);
+  };
+
   if (!isConnected) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-xl">Connecting to server...</div>
+        <div className="text-xl">Connecting to server...</div> 
       </div>
     );
   }
@@ -78,6 +96,7 @@ const App = () => {
             <div className="flex flex-col items-center">
               <GameStatus />
               <Board />
+              <LeaveButton onLeave={handleLeave} /> {/* LeaveButton ekleniyor */}
             </div>
           </div>
         </div>
