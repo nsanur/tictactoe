@@ -5,7 +5,7 @@ import Board from './components/Board';
 import PlayerList from './components/PlayerList';
 import GameStatus from './components/GameStatus';
 import Login from './components/Login';
-import LeaveButton from './components/LeaveButton'; // LeaveButton import edildi
+import LeaveButton from './components/LeaveButton';
 
 const App = () => {
   const { 
@@ -24,6 +24,15 @@ const App = () => {
   } = useGameStore();
 
   useEffect(() => {
+    // Tarayıcı depolamasını kontrol et
+    const savedPlayerName = localStorage.getItem('playerName');
+    if (savedPlayerName) {
+      setPlayerName(savedPlayerName);
+    } else {
+      // Eğer kullanıcı adı kaydedilmemişse, çıkış yap
+      handleLeave();
+    }
+
     const SOCKET_URL = import.meta.env.PROD 
       ? 'https://tictactoe-4n35.onrender.com' 
       : 'http://localhost:3001';
@@ -45,6 +54,8 @@ const App = () => {
     newSocket.on('joinSuccess', ({ name }) => {
       setPlayerName(name);
       setError(null);
+      // Kullanıcı adı kaydını localStorage'a kaydet
+      localStorage.setItem('playerName', name);
     });
 
     newSocket.on('error', ({ message }) => {
@@ -75,6 +86,9 @@ const App = () => {
     setPlayers([]);
     setSpectators([]);
     setWinner(null);
+
+    // localStorage'dan kullanıcı adını sil
+    localStorage.removeItem('playerName');
   };
 
   if (!isConnected) {
