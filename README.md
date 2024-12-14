@@ -18,6 +18,8 @@ This project is a multiplayer Tic-Tac-Toe game that supports up to 4 players con
    
    npm install
 
+   npm run build
+
    npm run dev
 
 1. **Install server dependencies**:
@@ -27,4 +29,4 @@ This project is a multiplayer Tic-Tac-Toe game that supports up to 4 players con
    
    npm install
 
-   node server.js
+   npm start
