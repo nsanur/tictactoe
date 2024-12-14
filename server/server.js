@@ -48,8 +48,22 @@ const resetGame = () => {
 
 io.on('connection', (socket) => {
   socket.on('join', ({ name }) => {
+    // Kullanıcı adı 10 karakteri geçmemeli
+    if (name.length > 10) {
+      socket.emit('error', { message: 'Username can be at most 10 characters long.' });
+      return;
+    }
+    
+    // Same name cannot be used by another player
     if (gameState.players.some(p => p.name === name)) {
-      socket.emit('error', { message: 'Name already taken' });
+      socket.emit('error', { message: 'Username is already taken.' });
+      return;
+    }
+    
+
+    // İzleyici sayısı 2'yi geçemez
+    if (gameState.players.length === 2 && gameState.spectators.length >= 2) {
+      socket.emit('error', { message: 'The room is full. Spectator limit reached.' });
       return;
     }
 
@@ -96,6 +110,39 @@ io.on('connection', (socket) => {
     }
 
     io.emit('gameState', gameState);
+  });
+
+  socket.on('leave', () => {
+    const playerIndex = gameState.players.findIndex(p => p.id === socket.id);
+    if (playerIndex !== -1) {
+      // Oyuncuyu oyun listesinden çıkarıyoruz
+      const playerName = gameState.players[playerIndex].name;
+      gameState.players.splice(playerIndex, 1);
+  
+      if (gameState.spectators.length > 0) {
+        // Yeni bir oyuncu, spectatörden alınıp oyuncu olarak eklenir
+        const newPlayer = {
+          id: '',
+          name: gameState.spectators[0],
+          wins: 0,
+          losses: 0
+        };
+        gameState.players.push(newPlayer);
+        gameState.spectators.shift();
+      }
+  
+      resetGame();  // Oyun durumunu sıfırla
+      console.log(`${playerName} has left the game.`);
+    } else {
+      // Spectatörlerden çıkarma
+      gameState.spectators = gameState.spectators.filter(name => name !== socket.data.name);
+    }
+  
+    // Oyun durumunu güncelle
+    io.emit('gameState', gameState);
+  
+    // Frontend'e yönlendirme için bildirim gönder
+    socket.emit('redirectToHomePage');
   });
 
   socket.on('disconnect', () => {
