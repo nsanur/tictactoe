@@ -11,6 +11,7 @@ export const useGameStore = create((set) => ({
   playerName: '', // Name of the current player
   isConnected: false, // Connection status to the server
   error: null, // Error message if any
+  connectionError: null, //new
 
   // Actions to update the state
   setSocket: (socket) => set({ socket }),
@@ -22,6 +23,7 @@ export const useGameStore = create((set) => ({
   setPlayerName: (name) => set({ playerName: name }),
   setIsConnected: (status) => set({ isConnected: status }),
   setError: (error) => set({ error }),
+  setConnectionError: (error) => set({ connectionError: error }), //new
 
   // Reset the game state
   reset: () => set({
@@ -31,4 +33,17 @@ export const useGameStore = create((set) => ({
     error: null,
     playerName: '', // Reset playerName here
   }),
+
+  //new
+  // Add cleanup function
+  cleanup: () => set({
+    board: Array(9).fill(''),
+    currentPlayer: '',
+    winner: null,
+    error: null,
+    playerName: '',
+    players: [],
+    spectators: [],
+    connectionError: null
+  })
 }));  
