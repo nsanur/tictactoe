@@ -5,10 +5,10 @@ import Board from './components/Board';
 import PlayerList from './components/PlayerList';
 import GameStatus from './components/GameStatus';
 import Login from './components/Login';
-import LeaveButton from './components/LeaveButton';
+import LeaveButton from './components/LeaveButton'; // LeaveButton import edildi
 
 const App = () => {
-  const {
+  const { 
     setSocket,
     isConnected,
     playerName,
@@ -20,34 +20,24 @@ const App = () => {
     setWinner,
     setPlayerName,
     setError,
-    setConnectionError,
-    reset,
-    cleanup
+    reset
   } = useGameStore();
 
   useEffect(() => {
-    const SOCKET_URL = import.meta.env.PROD
-      ? 'https://tictactoe-4n35.onrender.com'
+    const SOCKET_URL = import.meta.env.PROD 
+      ? 'https://tictactoe-4n35.onrender.com' 
       : 'http://localhost:3001';
-    
+      
     const newSocket = io(SOCKET_URL);
     setSocket(newSocket);
 
-    newSocket.on('connect', () => {
-      setIsConnected(true);
-      setConnectionError(null);
-    });
-
-    newSocket.on('connect_error', (error) => {
-      setConnectionError('Connection failed. Please try again.');
-      setIsConnected(false);
-    });
-
+    newSocket.on('connect', () => setIsConnected(true));
     newSocket.on('disconnect', () => setIsConnected(false));
 
     newSocket.on('spectatorPromoted', ({ playerName }) => {
       if (playerName === useGameStore.getState().playerName) {
-        newSocket.emit('updatePlayerId', { playerName });
+          // Update socket ID for the promoted player
+          newSocket.emit('updatePlayerId', { playerName });
       }
     });
 
@@ -72,47 +62,32 @@ const App = () => {
       reset();
     });
 
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
-        const socket = useGameStore.getState().socket;
-        if (socket) {
-          socket.emit('leave');
-        }
-      }
-    };
-
-    const handleBeforeUnload = () => {
-      const socket = useGameStore.getState().socket;
-      if (socket) {
-        socket.emit('leave');
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    window.addEventListener('pagehide', handleBeforeUnload);
-
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      window.removeEventListener('pagehide', handleBeforeUnload);
       newSocket.disconnect();
-      cleanup();
     };
   }, []);
 
   const handleLeave = () => {
-    const socket = useGameStore.getState().socket;
+    const socket = useGameStore.getState().socket;  // Bu kısımda doğru socket kullanılıyor
+
     if (socket) {
-      socket.emit('leave');
+      socket.emit('leave'); // Backend'e çıkış bildirimini gönderme
     }
-    cleanup();
+
+    // Oyun durumunu sıfırlama
+    reset();
+
+    // Tüm store verilerini sıfırlama
+    setPlayerName('');
+    setPlayers([]);
+    setSpectators([]);
+    setWinner(null);
   };
 
   if (!isConnected) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-xl">Connecting to server...</div>
+        <div className="text-xl">Connecting to server...</div> 
       </div>
     );
   }
@@ -128,7 +103,7 @@ const App = () => {
             <div className="flex flex-col items-center">
               <GameStatus />
               <Board />
-              <LeaveButton onLeave={handleLeave} />
+              <LeaveButton onLeave={handleLeave} /> {/* LeaveButton ekleniyor */}
             </div>
           </div>
         </div>
