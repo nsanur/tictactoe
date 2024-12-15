@@ -5,10 +5,10 @@ import Board from './components/Board';
 import PlayerList from './components/PlayerList';
 import GameStatus from './components/GameStatus';
 import Login from './components/Login';
-import LeaveButton from './components/LeaveButton'; // LeaveButton import edildi
+import LeaveButton from './components/LeaveButton';
 
 const App = () => {
-  const { 
+  const {
     setSocket,
     isConnected,
     playerName,
@@ -23,11 +23,25 @@ const App = () => {
     reset
   } = useGameStore();
 
+  const handleLeave = () => {
+    const socket = useGameStore.getState().socket;
+
+    if (socket) {
+      socket.emit('leave');
+    }
+
+    reset();
+    setPlayerName('');
+    setPlayers([]);
+    setSpectators([]);
+    setWinner(null);
+  };
+
   useEffect(() => {
-    const SOCKET_URL = import.meta.env.PROD 
-      ? 'https://tictactoe-4n35.onrender.com' 
+    const SOCKET_URL = import.meta.env.PROD
+      ? 'https://tictactoe-4n35.onrender.com'
       : 'http://localhost:3001';
-      
+
     const newSocket = io(SOCKET_URL);
     setSocket(newSocket);
 
@@ -36,8 +50,7 @@ const App = () => {
 
     newSocket.on('spectatorPromoted', ({ playerName }) => {
       if (playerName === useGameStore.getState().playerName) {
-          // Update socket ID for the promoted player
-          newSocket.emit('updatePlayerId', { playerName });
+        newSocket.emit('updatePlayerId', { playerName });
       }
     });
 
@@ -67,27 +80,34 @@ const App = () => {
     };
   }, []);
 
-  const handleLeave = () => {
-    const socket = useGameStore.getState().socket;  // Bu kısımda doğru socket kullanılıyor
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        handleLeave();
+      }
+    };
 
-    if (socket) {
-      socket.emit('leave'); // Backend'e çıkış bildirimini gönderme
-    }
+    const handleBeforeUnload = (e) => {
+      handleLeave();
+      e.preventDefault();
+      e.returnValue = '';
+    };
 
-    // Oyun durumunu sıfırlama
-    reset();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('pagehide', handleLeave);
 
-    // Tüm store verilerini sıfırlama
-    setPlayerName('');
-    setPlayers([]);
-    setSpectators([]);
-    setWinner(null);
-  };
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('pagehide', handleLeave);
+    };
+  }, []);
 
   if (!isConnected) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-xl">Connecting to server...</div> 
+        <div className="text-xl">Connecting to server...</div>
       </div>
     );
   }
@@ -103,7 +123,7 @@ const App = () => {
             <div className="flex flex-col items-center">
               <GameStatus />
               <Board />
-              <LeaveButton onLeave={handleLeave} /> {/* LeaveButton ekleniyor */}
+              <LeaveButton onLeave={handleLeave} />
             </div>
           </div>
         </div>
