@@ -1,7 +1,7 @@
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -115,34 +115,40 @@ io.on('connection', (socket) => {
   socket.on('leave', () => {
     const playerIndex = gameState.players.findIndex(p => p.id === socket.id);
     if (playerIndex !== -1) {
-      // Oyuncuyu oyun listesinden çıkarıyoruz
-      const playerName = gameState.players[playerIndex].name;
-      gameState.players.splice(playerIndex, 1);
-  
-      if (gameState.spectators.length > 0) {
-        // Yeni bir oyuncu, spectatörden alınıp oyuncu olarak eklenir
-        const newPlayer = {
-          id: '',
-          name: gameState.spectators[0],
-          wins: 0,
-          losses: 0
-        };
-        gameState.players.push(newPlayer);
-        gameState.spectators.shift();
-      }
-  
-      resetGame();  // Oyun durumunu sıfırla
-      console.log(`${playerName} has left the game.`);
+        const playerName = gameState.players[playerIndex].name;
+        gameState.players.splice(playerIndex, 1);
+
+        if (gameState.spectators.length > 0) {
+            // Create new player from spectator without an ID initially
+            const newPlayer = {
+                id: '', // Leave empty for now
+                name: gameState.spectators[0],
+                wins: 0,
+                losses: 0
+            };
+            gameState.players.push(newPlayer);
+            gameState.spectators.shift();
+
+            // Broadcast to all clients that a new player slot is available
+            io.emit('spectatorPromoted', { playerName: newPlayer.name });
+        }
+
+        resetGame();
+        console.log(`${playerName} has left the game.`);
     } else {
-      // Spectatörlerden çıkarma
-      gameState.spectators = gameState.spectators.filter(name => name !== socket.data.name);
+        gameState.spectators = gameState.spectators.filter(name => name !== socket.data.name);
     }
-  
-    // Oyun durumunu güncelle
+
     io.emit('gameState', gameState);
-  
-    // Frontend'e yönlendirme için bildirim gönder
     socket.emit('redirectToHomePage');
+  });
+
+  socket.on('updatePlayerId', ({ playerName }) => {
+    const player = gameState.players.find(p => p.name === playerName);
+    if (player) {
+        player.id = socket.id;
+        io.emit('gameState', gameState);
+    }
   });
 
   socket.on('disconnect', () => {
