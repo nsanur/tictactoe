@@ -8,6 +8,7 @@ import Login from './components/Login';
 import LeaveButton from './components/LeaveButton';
 
 const App = () => {
+  // Get state and actions from game store
   const {
     setSocket,
     isConnected,
@@ -23,13 +24,13 @@ const App = () => {
     reset
   } = useGameStore();
 
+  // Handle player leaving the game
   const handleLeave = () => {
     const socket = useGameStore.getState().socket;
-
     if (socket) {
       socket.emit('leave');
     }
-
+    // Reset all game state
     reset();
     setPlayerName('');
     setPlayers([]);
@@ -37,6 +38,7 @@ const App = () => {
     setWinner(null);
   };
 
+  // Setup socket connection and event handlers
   useEffect(() => {
     const SOCKET_URL = import.meta.env.PROD
       ? 'https://tictactoe-4n35.onrender.com'
@@ -45,9 +47,11 @@ const App = () => {
     const newSocket = io(SOCKET_URL);
     setSocket(newSocket);
 
+    // Connection events
     newSocket.on('connect', () => setIsConnected(true));
     newSocket.on('disconnect', () => setIsConnected(false));
 
+    // Game events
     newSocket.on('spectatorPromoted', ({ playerName }) => {
       if (playerName === useGameStore.getState().playerName) {
         newSocket.emit('updatePlayerId', { playerName });
@@ -75,11 +79,13 @@ const App = () => {
       reset();
     });
 
+    // Cleanup on unmount
     return () => {
       newSocket.disconnect();
     };
   }, []);
 
+  // Handle page visibility and unload events
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
@@ -93,10 +99,12 @@ const App = () => {
       e.returnValue = '';
     };
 
+    // Add event listeners
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('beforeunload', handleBeforeUnload);
     window.addEventListener('pagehide', handleLeave);
 
+    // Cleanup event listeners
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('beforeunload', handleBeforeUnload);
@@ -104,6 +112,7 @@ const App = () => {
     };
   }, []);
 
+  // Show loading state
   if (!isConnected) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -112,6 +121,7 @@ const App = () => {
     );
   }
 
+  // Render game or login
   return (
     <div className="min-h-screen bg-gray-50">
       {!playerName ? (
