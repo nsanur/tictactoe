@@ -5,7 +5,7 @@ import Board from './components/Board';
 import PlayerList from './components/PlayerList';
 import GameStatus from './components/GameStatus';
 import Login from './components/Login';
-import LeaveButton from './components/LeaveButton';
+import LeaveButton from './components/LeaveButton'; // LeaveButton import edildi
 
 const App = () => {
   const { 
@@ -24,15 +24,6 @@ const App = () => {
   } = useGameStore();
 
   useEffect(() => {
-    // Sayfa yenilendiğinde playerName kontrolü yap
-    const savedPlayerName = localStorage.getItem('playerName');
-    if (savedPlayerName) {
-      setPlayerName(savedPlayerName);
-    } else {
-      // Eğer kullanıcı adı kaydedilmemişse, çıkış yap
-      handleLeave();
-    }
-
     const SOCKET_URL = import.meta.env.PROD 
       ? 'https://tictactoe-4n35.onrender.com' 
       : 'http://localhost:3001';
@@ -42,6 +33,13 @@ const App = () => {
 
     newSocket.on('connect', () => setIsConnected(true));
     newSocket.on('disconnect', () => setIsConnected(false));
+
+    newSocket.on('spectatorPromoted', ({ playerName }) => {
+      if (playerName === useGameStore.getState().playerName) {
+          // Update socket ID for the promoted player
+          newSocket.emit('updatePlayerId', { playerName });
+      }
+    });
 
     newSocket.on('gameState', ({ board, currentPlayer, players, spectators, winner }) => {
       setBoard(board);
@@ -54,8 +52,6 @@ const App = () => {
     newSocket.on('joinSuccess', ({ name }) => {
       setPlayerName(name);
       setError(null);
-      // Kullanıcı adı kaydını localStorage'a kaydet
-      localStorage.setItem('playerName', name);
     });
 
     newSocket.on('error', ({ message }) => {
@@ -72,7 +68,7 @@ const App = () => {
   }, []);
 
   const handleLeave = () => {
-    const socket = useGameStore.getState().socket;
+    const socket = useGameStore.getState().socket;  // Bu kısımda doğru socket kullanılıyor
 
     if (socket) {
       socket.emit('leave'); // Backend'e çıkış bildirimini gönderme
@@ -86,9 +82,6 @@ const App = () => {
     setPlayers([]);
     setSpectators([]);
     setWinner(null);
-
-    // localStorage'dan kullanıcı adını sil
-    localStorage.removeItem('playerName');
   };
 
   if (!isConnected) {
