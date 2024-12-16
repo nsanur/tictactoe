@@ -66,7 +66,8 @@ Follow these steps to set up and run the project:
    npm install
 
    npm start
-
+   
+## Project Structure
    root/
 ├── client/      # Frontend (React + Vite)
 ├── server/      # Backend (Node.js + Socket.io)
