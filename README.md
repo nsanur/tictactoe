@@ -16,7 +16,8 @@ This project is a **multiplayer Tic-Tac-Toe game** that supports up to 4 players
 
 ## Preview
 
-<img src="[./assets/image.gif](https://github.com/user-attachments/assets/3a919d01-4a12-4f6f-ad69-8dc18aa12a77)"/>
+![tictactoe-speed](https://github.com/user-attachments/assets/4fa06433-972f-4a22-9cd9-0db7b5079290)
+
 
 Here are some screenshots of the project:
 
