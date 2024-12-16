@@ -6,7 +6,7 @@ This project is a **multiplayer Tic-Tac-Toe game** that supports up to 4 players
 
 ## Features
 
-- **Real-time multiplayer gameplay** for up to 4 players.
+- **Real-time multiplayer gameplay** for up to 4 players. (2 players and 2 spectators)
 - **Spectator mode** to watch live matches.
 - **Stats tracking** for wins and losses.
 - **Mobile-friendly interface** with a minimalist design.
