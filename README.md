@@ -19,14 +19,14 @@ This project is a **multiplayer Tic-Tac-Toe game** that supports up to 4 players
 Here are some screenshots of the project:
 
 ### Login Page
-![Screenshot 2024-12-16 102130](https://github.com/user-attachments/assets/407adc12-f875-4532-ae43-5db02d454f60)
+<img src="https://github.com/user-attachments/assets/407adc12-f875-4532-ae43-5db02d454f60" alt="Login Page" width="600" />
 
 ### Game Room
-![Screenshot 2024-12-16 102643](https://github.com/user-attachments/assets/bf922b7d-d88d-4da1-831c-8892e3c94605)
+<img src="https://github.com/user-attachments/assets/bf922b7d-d88d-4da1-831c-8892e3c94605" alt="Game Room" width="600" />
 
 ### Constraints
-![Screenshot 2024-12-16 102150](https://github.com/user-attachments/assets/eaa7eb12-ab1e-4b5f-abbd-7faa1c10fe06)
-![Screenshot 2024-12-16 102934](https://github.com/user-attachments/assets/082046f0-ea82-4bb6-8371-8656b545ee2b)
+<img src="https://github.com/user-attachments/assets/eaa7eb12-ab1e-4b5f-abbd-7faa1c10fe06" alt="Constraints 1" width="400" />
+<img src="https://github.com/user-attachments/assets/082046f0-ea82-4bb6-8371-8656b545ee2b" alt="Constraints 2" width="400" />
 
 
 ---
@@ -45,7 +45,7 @@ To run this project locally, ensure you have the following installed:
 Follow these steps to set up and run the project:
 
 
-### 1. Client
+### Client (Frontend)
 
 1. **Install client dependencies**:
    ```bash
@@ -57,8 +57,9 @@ Follow these steps to set up and run the project:
    npm run build
 
    npm run dev
+### Server (Backend)
 
-1. **Install server dependencies**:
+2. **Install server dependencies**:
    ```bash
 
    cd server
@@ -68,6 +69,7 @@ Follow these steps to set up and run the project:
    npm start
    
 ## Project Structure
+  ```bash
    root/
 ├── client/      # Frontend (React + Vite)
 ├── server/      # Backend (Node.js + Socket.io)
