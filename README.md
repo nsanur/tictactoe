@@ -19,14 +19,14 @@ This project is a **multiplayer Tic-Tac-Toe game** that supports up to 4 players
 Here are some screenshots of the project:
 
 ### Login Page
-<img src="https://github.com/user-attachments/assets/ca8843e7-c1c9-42f9-9e7a-ab7158e7514d" alt="Login Page" width="600" />
+<img src="https://github.com/user-attachments/assets/ca8843e7-c1c9-42f9-9e7a-ab7158e7514d" alt="Login Page"/>
 
 ### Game Room
-<img src="https://github.com/user-attachments/assets/19757703-89c1-4c2e-9d28-906375a00d48" alt="Game Room" width="600" />
+<img src="https://github.com/user-attachments/assets/19757703-89c1-4c2e-9d28-906375a00d48" alt="Game Room"/>
 
 ### Constraints
-<img src="https://github.com/user-attachments/assets/99fe6a8d-e4cb-4ab3-b709-42653614051b" alt="Constraints 1" width="400" />
-<img src="https://github.com/user-attachments/assets/94330fcc-4792-4b31-b95c-a2a3abec708d" alt="Constraints 2" width="400" />
+<img src="https://github.com/user-attachments/assets/99fe6a8d-e4cb-4ab3-b709-42653614051b" alt="Constraints 1"/>
+<img src="https://github.com/user-attachments/assets/94330fcc-4792-4b31-b95c-a2a3abec708d" alt="Constraints 2"/>
 
 
 ---
