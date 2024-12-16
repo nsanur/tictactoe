@@ -27,6 +27,7 @@ Here are some screenshots of the project:
 ### Constraints
 <img src="https://github.com/user-attachments/assets/99fe6a8d-e4cb-4ab3-b709-42653614051b" alt="Constraints 1"/>
 <img src="https://github.com/user-attachments/assets/94330fcc-4792-4b31-b95c-a2a3abec708d" alt="Constraints 2"/>
+<img src="https://github.com/user-attachments/assets/0a75fdd0-23ac-43f8-8f5c-699bde6ce443" alt="Constraints 2"/>
 
 
 ---
